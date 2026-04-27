@@ -131,6 +131,8 @@ function checkMigrations(templateRoot: string): Pick<
   const candidates = [
     "db/migrations",
     "drizzle",
+    "src/lib/db/migrations", // Drizzle co-located under src/lib (TL00-BASE layout)
+    "src/db/migrations",     // Drizzle co-located under src/db
     "prisma/migrations",
     "supabase/migrations",
     "database/migrations", // Laravel
@@ -162,6 +164,8 @@ function checkSeed(templateRoot: string): Pick<
 > {
   const candidates = [
     "db/seed.ts", "db/seed.js", "db/seed.mjs",
+    "src/lib/db/seed.ts", "src/lib/db/seed.js", "src/lib/db/seed.mjs", // co-located under src/lib (TL00-BASE)
+    "src/db/seed.ts", "src/db/seed.js", "src/db/seed.mjs",
     "prisma/seed.ts", "prisma/seed.js",
     "scripts/seed.ts", "scripts/seed.js",
     "database/seeders",      // Laravel directory
