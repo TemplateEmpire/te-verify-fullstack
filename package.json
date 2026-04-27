@@ -1,0 +1,32 @@
+{
+  "name": "@halbon/te-verify-fullstack",
+  "version": "0.1.0",
+  "description": "Template Empire full-stack template (TL/TP/TX) buyer-ZIP verification pipeline (Phase 1 deterministic gates). Phase 2 LLM review lives in the te-verify-fullstack-review Claude Code skill.",
+  "type": "module",
+  "bin": {
+    "te-verify-fullstack": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "verify": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "commander": "^12.1.0",
+    "execa": "^9.5.2",
+    "fast-glob": "^3.3.2",
+    "picocolors": "^1.1.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.7",
+    "@types/node": "^22.9.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
