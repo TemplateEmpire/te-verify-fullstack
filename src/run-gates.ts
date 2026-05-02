@@ -151,11 +151,10 @@ export function gatesForEcosystem(ecosystem: StackEcosystem): EcosystemGates | n
         install:   { command: "pnpm", args: ["install", "--frozen-lockfile", "--prefer-offline"], timeoutMs: 600_000 },
         typecheck: { command: "pnpm", args: ["typecheck"], timeoutMs: 180_000 },
         lint:      { command: "pnpm", args: ["lint"], timeoutMs: 180_000 },
-        // Just `pnpm test`. Templates set `"test": "vitest run"` already (vitest's
-        // non-watch mode), so appending `-- --run` is at best redundant and at
-        // worst causes execa to forward `"--" "--run"` as positional args
-        // ("No test files found" when vitest treats them as filter patterns).
-        test:      { command: "pnpm", args: ["test"], timeoutMs: 600_000 },
+        // Buyer ZIPs intentionally do not ship the repository test harness.
+        // Source tests run in template CI before packaging; ZIP verification
+        // covers install/typecheck/lint/build/audit plus structural/compliance.
+        test:      null,
         build:     { command: "pnpm", args: ["build"], timeoutMs: 900_000 },
         audit:     { command: "pnpm", args: ["audit", "--prod", "--audit-level=high"], timeoutMs: 60_000 },
       };

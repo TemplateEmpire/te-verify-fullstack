@@ -63,9 +63,12 @@ Command gates (Node ecosystem first; others stubbed for now):
 - `install` — `pnpm install --frozen-lockfile`
 - `typecheck` — `pnpm typecheck`
 - `lint` — `pnpm lint` (zero-warning policy via post-processor)
-- `test` — `pnpm test -- --run`
 - `build` — `pnpm build`
 - `audit` — `pnpm audit --prod --audit-level=high`
+
+Buyer ZIPs intentionally do not ship repository test harnesses. Source tests run
+in template CI before packaging; this verifier checks the packaged artefact a
+buyer actually receives.
 
 ## Adding a new ecosystem
 
