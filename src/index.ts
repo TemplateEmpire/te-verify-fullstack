@@ -8,6 +8,7 @@ import pc from "picocolors";
 import { complianceScan } from "./compliance-scan.js";
 import { scanContent } from "./content-scan.js";
 import { cleanup, extractZip } from "./extract.js";
+import { featureScopeScan } from "./feature-scope-scan.js";
 import { deriveFindings } from "./findings.js";
 import { renderMarkdownReport, writeEvidenceJson, writeMarkdown } from "./report.js";
 import {
@@ -157,6 +158,24 @@ program
     });
     process.stdout.write(`  compliance…     ${complianceP0Pass ? pc.green("✓") : pc.red("✗")}\n`);
 
+    const featureScope = featureScopeScan(templateRoot, slug);
+    const featureScopePass =
+      featureScope.forbiddenRoutes.length === 0 &&
+      featureScope.missingRequiredRoutes.length === 0;
+    gates.push({
+      id: "feature-scope",
+      name: "Feature scope (family matrix route surfaces)",
+      status: featureScopePass ? "PASS" : "FAIL",
+      durationMs: 0,
+      metadata: {
+        familyId: featureScope.familyId,
+        expectedCommerce: featureScope.expectedCommerce,
+        forbiddenRoutes: featureScope.forbiddenRoutes.length,
+        missingRequiredRoutes: featureScope.missingRequiredRoutes.length,
+      },
+    });
+    process.stdout.write(`  feature-scope…  ${featureScopePass ? pc.green("✓") : pc.red("✗")}\n`);
+
     // ── Command gates (ecosystem-aware) ──
     const ecosystemGates = gatesForEcosystem(detected.ecosystem);
     if (ecosystemGates && options.install !== false) {
@@ -204,6 +223,7 @@ program
       versionCheck,
       structuralCheck: structural,
       complianceScan: compliance,
+      featureScopeScan: featureScope,
       tier,
       isBaseTemplate,
     });
@@ -237,6 +257,7 @@ program
       versionCheck,
       structuralCheck: structural,
       complianceScan: compliance,
+      featureScopeScan: featureScope,
       findings,
       summary: {
         totalGates: gates.length,

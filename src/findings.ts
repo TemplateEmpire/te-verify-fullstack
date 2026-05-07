@@ -2,6 +2,7 @@ import { VERSION_PRIORITY } from "./version-check.js";
 import type {
   ComplianceScan,
   ContentScan,
+  FeatureScopeScan,
   Finding,
   GateResult,
   Priority,
@@ -21,6 +22,7 @@ export function deriveFindings(input: {
   versionCheck: VersionCheck;
   structuralCheck: StructuralCheck;
   complianceScan: ComplianceScan;
+  featureScopeScan: FeatureScopeScan;
   tier: string;
   isBaseTemplate: boolean;
 }): Finding[] {
@@ -187,6 +189,18 @@ export function deriveFindings(input: {
       message: `Pre-checked marketing/consent input found: ${offender} (GDPR/UK GDPR Art 4(11) requires affirmative action)` });
   }
 
+  // ── Feature scope (template-family contract) ──
+  const fs = input.featureScopeScan;
+  for (const offender of fs.forbiddenRoutes) {
+    findings.push({ id: nextId(), priority: "P1", category: "Feature Scope",
+      message: `${offender.route} should not ship for TL${fs.familyId ?? "??"} (${fs.expectedCommerce}) — ${offender.reason}`,
+      evidence: offender.path });
+  }
+  for (const missing of fs.missingRequiredRoutes) {
+    findings.push({ id: nextId(), priority: "P1", category: "Feature Scope",
+      message: `${missing.route} is required for TL${fs.familyId ?? "??"} (${fs.expectedCommerce}) — ${missing.reason}` });
+  }
+
   // ── Lint strict ──
   const lintGate = input.gates.find((g) => g.id === "lint");
   if (lintGate?.metadata) {
@@ -210,6 +224,7 @@ function gatePriority(gateId: string): Priority {
     "install", "build", "audit",
     "zip-inspect", "content-scan", "version-check",
   ]);
+  if (gateId === "feature-scope") return "P1";
   if (p0Gates.has(gateId)) return "P0";
   return "P1";
 }
