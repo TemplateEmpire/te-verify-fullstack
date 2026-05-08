@@ -25,6 +25,7 @@ export function renderMarkdownReport(e: Evidence): string {
     versionCheck,
     structuralCheck,
     complianceScan,
+    featureScopeScan,
   } = e;
 
   L.push(`# TE-Verify Fullstack Report`);
@@ -84,6 +85,24 @@ export function renderMarkdownReport(e: Evidence): string {
   }
   L.push("");
 
+  L.push(`## Feature Scope`);
+  L.push("");
+  L.push(`- Family: ${featureScopeScan.familyId ? `TL${featureScopeScan.familyId}` : "unknown"}`);
+  L.push(`- Expected commerce surface: ${featureScopeScan.expectedCommerce}`);
+  L.push(`- Forbidden route surfaces: ${featureScopeScan.forbiddenRoutes.length}`);
+  L.push(`- Missing required route surfaces: ${featureScopeScan.missingRequiredRoutes.length}`);
+  if (featureScopeScan.forbiddenRoutes.length > 0) {
+    for (const offender of featureScopeScan.forbiddenRoutes.slice(0, 10)) {
+      L.push(`  - ${offender.route} — ${offender.path}`);
+    }
+  }
+  if (featureScopeScan.missingRequiredRoutes.length > 0) {
+    for (const missing of featureScopeScan.missingRequiredRoutes.slice(0, 10)) {
+      L.push(`  - ${missing.route} — ${missing.reason}`);
+    }
+  }
+  L.push("");
+
   L.push(`## Gates`);
   L.push("");
   for (const g of gates) {
@@ -124,6 +143,7 @@ export function renderMarkdownReport(e: Evidence): string {
   L.push(`**ZIP inspection:** ${zipInspection.entryCount} entries, forbidden=${zipInspection.forbiddenFound.length}, missing=${zipInspection.missingRequired.length}, missingDirs=${zipInspection.missingDirs.length}${zipInspection.extremeEntryCount ? `, extreme=${zipInspection.extremeEntryCount}` : ""}`);
   L.push(`**Content scan:** bom=${contentScan.bomFiles.length}, mojibake=${contentScan.mojibakeFiles.length}, secrets=${contentScan.secrets.length}, realVendors=${contentScan.realVendorsInLegal.length}`);
   L.push(`**Version issues:** ${versionCheck.issues.length}`);
+  L.push(`**Feature scope:** expectedCommerce=${featureScopeScan.expectedCommerce}, forbiddenRoutes=${featureScopeScan.forbiddenRoutes.length}, missingRequiredRoutes=${featureScopeScan.missingRequiredRoutes.length}`);
   L.push("");
   L.push(`_Full structured evidence in \`evidence.json\`. For Phase 2 LLM review, invoke the te-verify-fullstack-review skill in Claude Code._`);
 

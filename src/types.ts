@@ -171,8 +171,29 @@ export const ComplianceScanSchema = z.object({
 });
 export type ComplianceScan = z.infer<typeof ComplianceScanSchema>;
 
+// ── Template-family feature scope ───────────────────────────────────────────
+
+export const FeatureScopeScanSchema = z.object({
+  familyId: z.string().nullable(),
+  expectedCommerce: z.enum(["subscription", "none", "payment", "marketplace", "unknown"]),
+  forbiddenRoutes: z.array(
+    z.object({
+      route: z.string(),
+      path: z.string(),
+      reason: z.string(),
+    }),
+  ),
+  missingRequiredRoutes: z.array(
+    z.object({
+      route: z.string(),
+      reason: z.string(),
+    }),
+  ),
+});
+export type FeatureScopeScan = z.infer<typeof FeatureScopeScanSchema>;
+
 export const EvidenceSchema = z.object({
-  version: z.literal("1.0.0"),
+  version: z.literal("1.1.0"),
   template: z.object({
     zipPath: z.string(),
     zipName: z.string(),
@@ -198,6 +219,7 @@ export const EvidenceSchema = z.object({
   versionCheck: VersionCheckSchema,
   structuralCheck: StructuralCheckSchema,
   complianceScan: ComplianceScanSchema,
+  featureScopeScan: FeatureScopeScanSchema,
   findings: z.array(FindingSchema),
   summary: z.object({
     totalGates: z.number(),
