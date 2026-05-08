@@ -25,9 +25,26 @@ const FAMILY_COMMERCE: Record<string, ExpectedCommerce> = {
  * is to catch buyer-visible route surfaces that contradict the authoritative
  * feature matrix.
  */
-export function featureScopeScan(templateRoot: string, slug?: string): FeatureScopeScan {
+interface FeatureScopeScanOptions {
+  enabled?: boolean;
+}
+
+export function featureScopeScan(
+  templateRoot: string,
+  slug?: string,
+  options: FeatureScopeScanOptions = {},
+): FeatureScopeScan {
   const familyId = detectFamilyId(slug ?? basename(templateRoot));
   const expectedCommerce = familyId ? FAMILY_COMMERCE[familyId] ?? "unknown" : "unknown";
+  if (options.enabled === false) {
+    return {
+      familyId,
+      expectedCommerce,
+      forbiddenRoutes: [],
+      missingRequiredRoutes: [],
+    };
+  }
+
   const routes = collectAppRoutes(templateRoot);
   const forbiddenRoutes: FeatureScopeScan["forbiddenRoutes"] = [];
   const missingRequiredRoutes: FeatureScopeScan["missingRequiredRoutes"] = [];

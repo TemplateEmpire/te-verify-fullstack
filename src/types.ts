@@ -193,7 +193,7 @@ export const FeatureScopeScanSchema = z.object({
 export type FeatureScopeScan = z.infer<typeof FeatureScopeScanSchema>;
 
 export const EvidenceSchema = z.object({
-  version: z.literal("1.0.0"),
+  version: z.literal("1.1.0"),
   template: z.object({
     zipPath: z.string(),
     zipName: z.string(),

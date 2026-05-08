@@ -158,18 +158,23 @@ program
     });
     process.stdout.write(`  compliance…     ${complianceP0Pass ? pc.green("✓") : pc.red("✗")}\n`);
 
-    const featureScope = featureScopeScan(templateRoot, slug);
+    const featureScopeSupported = detected.stack === "nextjs";
+    const featureScope = featureScopeScan(templateRoot, slug, {
+      enabled: featureScopeSupported,
+    });
     const featureScopePass =
       featureScope.forbiddenRoutes.length === 0 &&
       featureScope.missingRequiredRoutes.length === 0;
     gates.push({
       id: "feature-scope",
       name: "Feature scope (family matrix route surfaces)",
-      status: featureScopePass ? "PASS" : "FAIL",
+      status: featureScopeSupported ? (featureScopePass ? "PASS" : "FAIL") : "SKIPPED",
       durationMs: 0,
       metadata: {
         familyId: featureScope.familyId,
         expectedCommerce: featureScope.expectedCommerce,
+        scanner: featureScopeSupported ? "nextjs-app-router" : "unsupported-stack",
+        stack: detected.stack,
         forbiddenRoutes: featureScope.forbiddenRoutes.length,
         missingRequiredRoutes: featureScope.missingRequiredRoutes.length,
       },
@@ -231,7 +236,7 @@ program
     const pCounts = countFindings(findings);
 
     const evidence: Evidence = {
-      version: "1.0.0",
+      version: "1.1.0",
       template: {
         zipPath: resolvedZip,
         zipName: basename(resolvedZip),
