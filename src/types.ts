@@ -192,6 +192,20 @@ export const FeatureScopeScanSchema = z.object({
 });
 export type FeatureScopeScan = z.infer<typeof FeatureScopeScanSchema>;
 
+// Pitfall-conformance result forwarded from the canon engine
+// (canon/scripts/conformance.mjs). `checks` is keyed by te-web inventory
+// item number; its status vocabulary (pass|fail|na|manual) is owned by
+// canon, so this stays a lenient string record rather than re-declaring it.
+export const ConformanceSchema = z.object({
+  engine: z.string(),
+  canonVersion: z.string().optional(),
+  canonDir: z.string().optional(),
+  productType: z.string(),
+  checks: z.record(z.string(), z.string()),
+  summary: z.record(z.string(), z.number()),
+});
+export type Conformance = z.infer<typeof ConformanceSchema>;
+
 export const EvidenceSchema = z.object({
   version: z.literal("1.1.0"),
   template: z.object({
@@ -220,6 +234,7 @@ export const EvidenceSchema = z.object({
   structuralCheck: StructuralCheckSchema,
   complianceScan: ComplianceScanSchema,
   featureScopeScan: FeatureScopeScanSchema,
+  conformance: ConformanceSchema.optional(),
   findings: z.array(FindingSchema),
   summary: z.object({
     totalGates: z.number(),
