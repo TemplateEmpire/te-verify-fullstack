@@ -6,6 +6,7 @@ import { basename, join, resolve } from "node:path";
 import pc from "picocolors";
 
 import { complianceScan } from "./compliance-scan.js";
+import { runConformance } from "./conformance.js";
 import { scanContent } from "./content-scan.js";
 import { cleanup, extractZip } from "./extract.js";
 import { featureScopeScan } from "./feature-scope-scan.js";
@@ -85,6 +86,21 @@ program
     console.log(pc.gray(`  tier:         ${tier}`));
     console.log(pc.gray(`  slug:         ${slug}${isBaseTemplate ? " (BASE — looser structural rules)" : ""}`));
     console.log("");
+
+    // ── Pitfall conformance (canon engine, against the pristine extract) ──
+    // Run before gates mutate the tree (install/build). This is the
+    // full-stack runner, so productType is always "full_stack".
+    const conformance = await runConformance(templateRoot, "full_stack");
+    if (conformance) {
+      const s = conformance.summary;
+      console.log(
+        pc.gray(
+          `  conformance:  ${s.pass ?? 0} pass  ${s.fail ?? 0} fail  ${s.manual ?? 0} manual` +
+            (conformance.canonVersion ? `  (canon ${conformance.canonVersion})` : ""),
+        ),
+      );
+      console.log("");
+    }
 
     const skipSet = new Set(
       options.skip.split(",").map((s) => s.trim()).filter(Boolean),
@@ -263,6 +279,7 @@ program
       structuralCheck: structural,
       complianceScan: compliance,
       featureScopeScan: featureScope,
+      conformance: conformance ?? undefined,
       findings,
       summary: {
         totalGates: gates.length,
