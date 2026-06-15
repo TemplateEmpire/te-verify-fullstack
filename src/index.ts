@@ -11,6 +11,7 @@ import { scanContent } from "./content-scan.js";
 import { cleanup, extractZip } from "./extract.js";
 import { featureScopeScan } from "./feature-scope-scan.js";
 import { deriveFindings } from "./findings.js";
+import { deriveProductSlug, detectFamilyId, familySlug } from "./product-slug.js";
 import { renderMarkdownReport, writeEvidenceJson, writeMarkdown } from "./report.js";
 import {
   detectStack,
@@ -82,9 +83,20 @@ program
     const tier = detectTier(slug);
     const isBaseTemplate = /(^|[-_/])tl00[-_/]?base/i.test(slug);
 
+    // Canonical product identity, derived from the branded slug's family number
+    // and the detected stack. The branded `slug` above stays the internal key
+    // (tier / family / base detection, run naming); these are the product-table
+    // identities a downstream consumer joins on.
+    const familyId = detectFamilyId(slug);
+    const productFamilySlug = familySlug(familyId);
+    const productSlug = deriveProductSlug(familyId, detected.stack);
+
     console.log(pc.gray(`  stack:        ${detected.stack} (${detected.ecosystem})`));
     console.log(pc.gray(`  tier:         ${tier}`));
     console.log(pc.gray(`  slug:         ${slug}${isBaseTemplate ? " (BASE — looser structural rules)" : ""}`));
+    if (productSlug) {
+      console.log(pc.gray(`  product:      ${productSlug}  (family ${productFamilySlug})`));
+    }
     console.log("");
 
     // ── Pitfall conformance (canon engine, against the pristine extract) ──
@@ -265,6 +277,8 @@ program
         ecosystem: detected.ecosystem,
         tier,
         slug,
+        productFamilySlug: productFamilySlug ?? undefined,
+        productSlug: productSlug ?? undefined,
       },
       environment: {
         node: process.version,
