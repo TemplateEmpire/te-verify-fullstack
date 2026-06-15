@@ -33,6 +33,9 @@ export function renderMarkdownReport(e: Evidence): string {
   L.push(`**ZIP:** \`${template.zipName}\` (${mb(template.zipSizeBytes)}, ${zipInspection.entryCount} entries)`);
   L.push(`**Package:** ${template.packageName ?? "(unknown)"} v${template.packageVersion ?? "?"}`);
   L.push(`**Stack:** ${template.stack} (${template.ecosystem})  **Tier:** ${template.tier}${template.slug ? `  **Slug:** ${template.slug}` : ""}`);
+  if (template.productSlug) {
+    L.push(`**Product:** \`${template.productSlug}\`${template.productFamilySlug ? ` (family \`${template.productFamilySlug}\`)` : ""}`);
+  }
   L.push(`**SHA256:** \`${template.sha256}\``);
   L.push(`**Run at:** ${environment.runAt} on ${environment.platform}`);
   L.push(`**Node:** ${environment.node}${environment.pnpm ? ` | **pnpm:** ${environment.pnpm}` : ""}`);

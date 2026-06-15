@@ -1,5 +1,6 @@
 import { existsSync, readdirSync } from "node:fs";
 import { basename, join, relative, sep } from "node:path";
+import { detectFamilyId } from "./product-slug.js";
 import type { FeatureScopeScan } from "./types.js";
 
 type ExpectedCommerce = FeatureScopeScan["expectedCommerce"];
@@ -90,11 +91,6 @@ export function featureScopeScan(
     forbiddenRoutes,
     missingRequiredRoutes,
   };
-}
-
-function detectFamilyId(slug: string): string | null {
-  const match = /(?:^|[^a-z0-9])tl(\d{2})(?:[^a-z0-9]|$)/i.exec(slug);
-  return match?.[1] ?? null;
 }
 
 interface AppRoute {

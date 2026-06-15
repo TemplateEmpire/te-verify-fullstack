@@ -219,7 +219,18 @@ export const EvidenceSchema = z.object({
     stack: StackSchema,
     ecosystem: StackEcosystemSchema,
     tier: TierSchema,
+    // Branded slug: the ZIP basename or --slug override (e.g.
+    // "TL05-Calendo-Booking-NextJS-v1.18.20"). Used internally for tier /
+    // family / base detection and report naming.
     slug: z.string().optional(),
+    // Canonical product-table identities derived from the family number +
+    // stack. product_family_slug = `${family}` (e.g. "booking");
+    // product_slug = `${family}-${stack}` (e.g. "booking-nextjs"). Present
+    // only when both resolve. The release-readiness ingest joins history by
+    // product_slug; this surfaces it as evidence rather than re-deriving it
+    // from the branded slug downstream.
+    productFamilySlug: z.string().optional(),
+    productSlug: z.string().optional(),
   }),
   environment: z.object({
     node: z.string(),
